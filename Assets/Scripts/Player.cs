@@ -83,7 +83,9 @@ public class Player : MonoBehaviour
         {
             if (teammate != this)
             {
-                float angleWithPlayer = Mathf.Abs(Vector3.Distance(transform.forward, teammate.transform.position));
+                Vector3 direction = teammate.transform.position - transform.position;
+                Quaternion rotation = Quaternion.LookRotation(direction);
+                float angleWithPlayer = Quaternion.Angle(transform.rotation, rotation);
                 if (angleWithPlayer < closestAngle)
                 {
                     closestAngle = angleWithPlayer;
@@ -91,9 +93,13 @@ public class Player : MonoBehaviour
                 }
             }
         });
-        Debug.Log("Pass to " + nearestPlayer.number);
-        Vector3 velocity = (transform.forward + Vector3.up) * speedDuringPass;
-        StartCoroutine(Ball.MoveTheBallDuringPass(nearestPlayer.transform.position, velocity, true));
+        float distanceToTeammate = Vector3.Distance(transform.position, nearestPlayer.transform.position) / 2;
+        float launchAngle = Mathf.Atan(2 * 5.0f / distanceToTeammate);
+        float speed = Mathf.Sqrt((Physics.gravity.y * Mathf.Pow(distanceToTeammate, 2)) / (2 * (5.0f - distanceToTeammate * Mathf.Tan(launchAngle)) * Mathf.Pow(Mathf.Cos(launchAngle), 2)));
+        Vector3 directionToTeammate = (nearestPlayer.transform.position - transform.position).normalized;
+        Vector3 velocityDirection = new Vector3(directionToTeammate.x * Mathf.Cos(launchAngle), Mathf.Sin(launchAngle), directionToTeammate.z * Mathf.Cos(launchAngle));
+        Vector3 velocity = velocityDirection * speed;
+        Ball.GetComponent<Rigidbody>().AddForce(velocity, ForceMode.VelocityChange);
     }
 
 }

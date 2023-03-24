@@ -54,10 +54,6 @@ public class BallController : MonoBehaviour
             }
 
         }
-        else if (other.CompareTag("Ground"))
-        {
-            isGrounded = true;
-        }
     }
 
     public IEnumerator SetShootModeToFalse()
@@ -66,15 +62,4 @@ public class BallController : MonoBehaviour
         ShootMode = false;
     }
 
-    public IEnumerator MoveTheBallDuringPass(Vector3 destination, Vector3 velocity, bool isParabolic)
-    {
-        isGrounded = false;
-        while (!isGrounded)
-        {
-            velocity.y += Time.deltaTime * (-9.81f);
-            transform.position += velocity * Time.deltaTime;
-            yield return null;
-        }
-        Debug.Log("EXIT");
-    }
 }
